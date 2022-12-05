@@ -1,36 +1,28 @@
 #include "mainwindow.h"
 #include "mainmenu.h"
+#include "iteminventory_view.h"
+#include "iteminventory_model.h"
+#include "constants.h"
 
 #include <QApplication>
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QString>
-#include <QTableWidget>
-#include <QHeaderView>
 #include <QPixmap>
 
-const int c_item_height = 150;
-const int c_item_width  = 150;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     // Создаем элементы интерфейса
-    auto inventory = new QTableWidget( 3, 3 );
-    inventory->horizontalHeader()->setDefaultSectionSize( c_item_width );
-    inventory->verticalHeader()->setDefaultSectionSize( c_item_height );
-    inventory->horizontalHeader()->hide();
-    inventory->verticalHeader()->hide();
-    inventory->setFixedSize( 3 * c_item_width, 3 * c_item_height );
-    inventory->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff);
-    inventory->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    inventory->setFrameShape(QFrame::NoFrame);
-
-    auto item_factory = new QLabel();
-    auto item_image = new QPixmap();
-    item_image->load(":/res/apple.png");
-    item_factory->setPixmap( *item_image );
+    auto inventory_view = new ItemInventoryView();
+    auto inventory_model = new ItemInventoryModel;
+    inventory_view->setModel( inventory_model );
+    auto item_label = new QLabel();
+    auto item_pixmap = new QPixmap();
+    item_pixmap->load( config::APPLE_IMAGE_PATH );
+    item_label->setPixmap( *item_pixmap );
 
     auto main_menu_button = new QPushButton( "Главное меню" );
 
@@ -39,12 +31,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Размещаем элементы на центарльном виджете
     auto lay1 = new QVBoxLayout();
     lay1->addStretch(1);
-    lay1->addWidget( item_factory, 0, Qt::AlignCenter );
+    lay1->addWidget( item_label, 0, Qt::AlignCenter );
     lay1->addStretch(2);
     lay1->addWidget( main_menu_button, 1, Qt::AlignCenter );
 
     auto lay2 = new QHBoxLayout();
-    lay2->addWidget( inventory );
+    lay2->addWidget( inventory_view );
     lay1->addStretch(1);
     lay2->addItem( lay1 );
 
