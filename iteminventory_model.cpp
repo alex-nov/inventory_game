@@ -1,19 +1,12 @@
 #include "iteminventory_model.h"
+#include "itemfactory.h"
 #include "constants.h"
 
 #include <QDebug>
 
 
-int getIndexFromRowColumn( int row, int column )
-{
-    return row * config::INVENTORY_COLUMNS_COUNT + column;
-}
-
 ItemInventoryModel::ItemInventoryModel()
 {
-    m_storage.reserve( config::INVENTORY_COLUMNS_COUNT * config::INVENTORY_ROWS_COUNT );
-   for( size_t i = 0; i <config::INVENTORY_COLUMNS_COUNT * config::INVENTORY_ROWS_COUNT; ++i )
-       m_storage.push_back( 0 );
 }
 
 int ItemInventoryModel::rowCount( const QModelIndex &parent ) const
@@ -43,24 +36,13 @@ QVariant ItemInventoryModel::data( const QModelIndex &index, int role ) const
     {
         case Qt::DecorationRole:
         {
-            if( m_storage.at( getIndexFromRowColumn( index.row(), index.column() ) ) > 0 )
-            {
-                variant_result = config::APPLE_IMAGE_PATH;
-            }
+            variant_result = DatabaseStorage::Instance()->GetItemImagePath( index.row(), index.column() );
         }
         break;
 
         case inventory_role::count_role:
         {
-            variant_result = m_storage.at( getIndexFromRowColumn( index.row(), index.column() ) );
-            qDebug()    << "ItemInventoryModel::Data " << getIndexFromRowColumn( index.row(), index.column() ) << " "
-                        << m_storage[ getIndexFromRowColumn( index.row(), index.column() ) ];
-        }
-        break;
-
-        case inventory_role::type_role:
-        {
-            variant_result = static_cast<int>( item_type::apple );
+            variant_result = DatabaseStorage::Instance()->GetItemsCountByPosition( index.row(), index.column() );
         }
         break;
     }
@@ -70,8 +52,6 @@ QVariant ItemInventoryModel::data( const QModelIndex &index, int role ) const
 
 bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &value, int role)
 {
-     Q_UNUSED(role);
-     Q_UNUSED(value);
     bool t_bool_success = false;
     if(!index.isValid()) {
         return t_bool_success;
@@ -81,18 +61,25 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
     {
         case inventory_role::count_role:
         {
-            if(value.canConvert(QMetaType::Int))
+            if( value.canConvert( QMetaType::Int ) )
             {
-                qDebug() << "ItemInventoryModel::setData "<< getIndexFromRowColumn( index.row(), index.column() ) << " "
-                         << m_storage[ getIndexFromRowColumn( index.row(), index.column() ) ] << " + " << value.toInt();
-                m_storage[ getIndexFromRowColumn( index.row(), index.column() ) ] += value.toInt();
-            }
-        }
-        break;
+                if( value.toInt() > 0 )
+                {
+                    DatabaseStorage::Instance()->MoveItemToInventory(
+                                index.row(), index.column(),
+                                ItemFactory::Instance()->CreateItem( item_type::apple ) );
 
-        case inventory_role::type_role:
-        {
-            //return item_type::apple;
+                    qDebug() << "ItemInventoryModel::setData add at row" << index.row()
+                             << " column" << index.column();
+                }
+                else
+                {
+                    DatabaseStorage::Instance()->DeleteItemFromInventory( index.row(), index.column() );
+
+                    qDebug() << "ItemInventoryModel::setData delete from row" << index.row()
+                             << " column" << index.column();
+                }
+            }
         }
         break;
     }

@@ -9,7 +9,7 @@
 class ItemFactory
 {
 public:
-    std::shared_ptr<Item> CreateItem( item_type m_type );
+    std::shared_ptr< Item > CreateItem( item_type m_type );
 
     static ItemFactory* Instance();
 
@@ -20,6 +20,7 @@ private:
     ItemFactory& operator=(ItemFactory&&);
 
     quint32 m_next_item_id;
+    quint32 m_last_created_item_id;
 };
 
 #endif // ITEMFACTORY_H

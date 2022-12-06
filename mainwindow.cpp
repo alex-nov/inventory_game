@@ -2,6 +2,7 @@
 #include "mainmenu.h"
 #include "iteminventory_view.h"
 #include "iteminventory_model.h"
+#include "databasestorage.h"
 #include "constants.h"
 
 #include <QApplication>
@@ -16,19 +17,22 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     // Создаем элементы интерфейса
+    // Model-view структура инвентаря
     auto inventory_view = new ItemInventoryView();
     auto inventory_model = new ItemInventoryModel;
     inventory_view->setModel( inventory_model );
+
+    // Объект порождающий новые предметы
     auto item_label = new QLabel();
     auto item_pixmap = new QPixmap();
     item_pixmap->load( config::APPLE_IMAGE_PATH );
     item_label->setPixmap( *item_pixmap );
 
+    // Элементы управления
     auto main_menu_button = new QPushButton( "Главное меню" );
-
     auto main_menu = new MainMenu();
 
-    // Размещаем элементы на центарльном виджете
+    // Размещаем элементы на центральном виджете
     auto lay1 = new QVBoxLayout();
     lay1->addStretch(1);
     lay1->addWidget( item_label, 0, Qt::AlignCenter );
@@ -56,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::quit_application()
 {
+    DatabaseStorage::Instance()->Clear();
     QApplication::quit();
 }
 

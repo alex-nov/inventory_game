@@ -1,6 +1,8 @@
 #ifndef ITEMINVENTORYMODEL_H
 #define ITEMINVENTORYMODEL_H
 
+#include <databasestorage.h>
+
 #include <QObject>
 #include <QAbstractTableModel>
 #include <QVector>
@@ -25,9 +27,6 @@ public:
             const QModelIndex &index,
             const QVariant &value,
             int role) Q_DECL_OVERRIDE;
-
-private:
-    std::vector<int> m_storage;
 };
 
 #endif // ITEMINVENTORYMODEL_H
