@@ -12,6 +12,7 @@ public:
 
 signals:
     void quit_action();
+    void start_action();
 
 protected:
     QPushButton * push_button_start;

@@ -39,6 +39,9 @@ ItemInventoryView::ItemInventoryView( QWidget *parent )
     setDropIndicatorShown(true);
 
     m_drag_point = QPoint();
+
+    // на старте инвентарь неактивен
+    setEnabled( false );
 }
 
 

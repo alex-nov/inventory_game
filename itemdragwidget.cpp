@@ -14,6 +14,7 @@ ItemDragWidget::ItemDragWidget( QWidget *parent )
     auto item_pixmap = new QPixmap();
     item_pixmap->load( config::APPLE_IMAGE_PATH );
     setPixmap( *item_pixmap );
+    setEnabled( false );
 }
 
 void ItemDragWidget::mousePressEvent(QMouseEvent *event)

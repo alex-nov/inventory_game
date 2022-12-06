@@ -5,8 +5,8 @@
 
 MainMenu::MainMenu(QWidget *parent) :
     QWidget(parent),
-    push_button_start(new QPushButton(QString("Начать"))),
-    push_button_exit(new QPushButton(QString("Выход")))
+    push_button_start( new QPushButton( QString( "Начать" ) )),
+    push_button_exit( new QPushButton( QString( "Выход" ) ))
 {
     auto lay1 = new QHBoxLayout();
     lay1->addStretch(1);
@@ -22,6 +22,6 @@ MainMenu::MainMenu(QWidget *parent) :
     setPalette( pal );
     setAutoFillBackground (true );
 
-    //connect(push_button_start, SIGNAL(clicked()), SIGNAL(ms_start()));
+    connect( push_button_start, SIGNAL( clicked() ), SIGNAL( start_action() ) );
     connect( push_button_exit, SIGNAL( clicked() ), SIGNAL( quit_action() ) );
 }
