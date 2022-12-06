@@ -23,6 +23,9 @@ public:
     QString GetItemImagePath( const quint8 row, const quint8 column );
     bool CreateNewItem( std::shared_ptr<Item> item );
 
+    bool MoveItemsIntoInventory( const quint8 row_from, const quint8 column_from,
+                                 const quint8 row_to, const quint8 column_to );
+
 private:
     DatabaseStorage();
     Q_DISABLE_COPY( DatabaseStorage )

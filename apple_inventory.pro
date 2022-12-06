@@ -11,10 +11,12 @@ CONFIG += c++11
 SOURCES += \
     databasestorage.cpp \
     item.cpp \
+    itemdragwidget.cpp \
     itemfactory.cpp \
     iteminventory_delegate.cpp \
     iteminventory_model.cpp \
     iteminventory_view.cpp \
+    itemmimedata.cpp \
     main.cpp \
     mainmenu.cpp \
     mainwindow.cpp
@@ -23,10 +25,12 @@ HEADERS += \
     constants.h \
     databasestorage.h \
     item.h \
+    itemdragwidget.h \
     itemfactory.h \
     iteminventory_delegate.h \
     iteminventory_model.h \
     iteminventory_view.h \
+    itemmimedata.h \
     mainmenu.h \
     mainwindow.h
 

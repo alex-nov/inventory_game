@@ -223,3 +223,24 @@ bool DatabaseStorage::CreateNewItem( std::shared_ptr<Item> item )
 
     return sql_query.exec();
 }
+
+bool DatabaseStorage::MoveItemsIntoInventory( const quint8 row_from, const quint8 column_from,
+                                              const quint8 row_to, const quint8 column_to )
+{
+    if( !m_database_connected )
+    {
+        return false;
+    }
+
+    QSqlQuery sql_query( m_database );
+    sql_query.prepare( QString( "UPDATE inventory SET row=:row_to, column=:column_to WHERE "
+                                "item_id IN "
+                                "(SELECT item_id from inventory WHERE "
+                                "row=:row_from AND column=:column_from);" ) );
+    sql_query.bindValue( 0, row_to );
+    sql_query.bindValue( 1, column_to );
+    sql_query.bindValue( 2, row_from );
+    sql_query.bindValue( 3, column_from );
+
+    return sql_query.exec();
+}

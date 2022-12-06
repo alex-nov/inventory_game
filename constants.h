@@ -13,12 +13,16 @@ namespace config
 
     const QString APPLE_IMAGE_PATH = ":/res/apple.png";
     const QString APPLE_DELETE_SOUND_PATH = ":/res/delete_item.wav";
+
+    const QString MIME_DATA_FORMAT = "application/item";
 }
 
 namespace inventory_role
 {
-    const int type_role  = Qt::UserRole    + 1;
-    const int count_role = type_role + 1;
+    const int add_apple  = Qt::UserRole + 1;
+    const int add_many_items = add_apple + 1;
+    const int delete_item = add_many_items + 1;
+    const int count_role = delete_item + 1;
 }
 
 enum class item_type

@@ -2,6 +2,7 @@
 #include "mainmenu.h"
 #include "iteminventory_view.h"
 #include "iteminventory_model.h"
+#include "itemdragwidget.h"
 #include "databasestorage.h"
 #include "constants.h"
 
@@ -19,14 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     // Создаем элементы интерфейса
     // Model-view структура инвентаря
     auto inventory_view = new ItemInventoryView();
-    auto inventory_model = new ItemInventoryModel;
+    auto inventory_model = new ItemInventoryModel();
     inventory_view->setModel( inventory_model );
 
     // Объект порождающий новые предметы
-    auto item_label = new QLabel();
-    auto item_pixmap = new QPixmap();
-    item_pixmap->load( config::APPLE_IMAGE_PATH );
-    item_label->setPixmap( *item_pixmap );
+    auto item_label = new ItemDragWidget();
 
     // Элементы управления
     auto main_menu_button = new QPushButton( "Главное меню" );
