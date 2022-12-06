@@ -12,6 +12,7 @@ namespace config
     const quint8  INVENTORY_COLUMNS_COUNT = 3;
 
     const QString APPLE_IMAGE_PATH = ":/res/apple.png";
+    const QString APPLE_DELETE_SOUND_PATH = ":/res/delete_item.wav";
 }
 
 namespace inventory_role

@@ -53,6 +53,7 @@ QVariant ItemInventoryModel::data( const QModelIndex &index, int role ) const
 bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &value, int role)
 {
     bool t_bool_success = false;
+
     if(!index.isValid()) {
         return t_bool_success;
     }
@@ -65,7 +66,7 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
             {
                 if( value.toInt() > 0 )
                 {
-                    DatabaseStorage::Instance()->MoveItemToInventory(
+                    t_bool_success = DatabaseStorage::Instance()->MoveItemToInventory(
                                 index.row(), index.column(),
                                 ItemFactory::Instance()->CreateItem( item_type::apple ) );
 
@@ -74,7 +75,7 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
                 }
                 else
                 {
-                    DatabaseStorage::Instance()->DeleteItemFromInventory( index.row(), index.column() );
+                    t_bool_success = DatabaseStorage::Instance()->DeleteItemFromInventory( index.row(), index.column() );
 
                     qDebug() << "ItemInventoryModel::setData delete from row" << index.row()
                              << " column" << index.column();

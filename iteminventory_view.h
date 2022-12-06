@@ -2,6 +2,7 @@
 #define ITEMINVENTORY_VIEW_H
 
 #include <QTableView>
+#include <QtMultimedia/QSound>
 
 class ItemInventoryView : public QTableView
 {

@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 
+
 ItemInventoryView::ItemInventoryView( QWidget *parent )
     : QTableView( parent )
 {
@@ -39,7 +40,7 @@ void ItemInventoryView::mousePressEvent( QMouseEvent *event )
         {
             if( t_model->setData( t_model_index, 1, inventory_role::count_role ) )
             {
-                //QSound::play(QString("doggrowl.wav"));
+
             }
         }
     } else if( event->button() == Qt::RightButton )
@@ -49,7 +50,7 @@ void ItemInventoryView::mousePressEvent( QMouseEvent *event )
         {
             if( t_model->setData( t_model_index, -1, inventory_role::count_role ) )
             {
-             //   QSound::play(QString("doggrowl.wav"));
+                 QSound::play( config::APPLE_DELETE_SOUND_PATH );
             }
         }
     }
