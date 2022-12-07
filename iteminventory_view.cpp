@@ -1,4 +1,5 @@
 #include "constants.h"
+#include "inventory_utils.h"
 #include "iteminventory_view.h"
 #include "iteminventory_delegate.h"
 #include "itemmimedata.h"
@@ -18,11 +19,11 @@ ItemInventoryView::ItemInventoryView( QWidget *parent )
     : QTableView( parent )
 {
     // Настройки внешнего вида инвентаря
-    setFixedSize( config::INVENTORY_COLUMNS_COUNT * config::ITEM_WIDTH,
-                  config::INVENTORY_ROWS_COUNT * config::ITEM_HEIGHT );
+    setFixedSize( config::INVENTORY_COLUMNS_COUNT * item::draw::APPLE_WIDTH,
+                  config::INVENTORY_ROWS_COUNT * item::draw::APPLE_HEIGHT );
 
-    horizontalHeader()->setDefaultSectionSize( config::ITEM_WIDTH );
-    verticalHeader()->setDefaultSectionSize( config::ITEM_HEIGHT );
+    horizontalHeader()->setDefaultSectionSize( item::draw::APPLE_WIDTH );
+    verticalHeader()->setDefaultSectionSize( item::draw::APPLE_HEIGHT );
     horizontalHeader()->hide();
     verticalHeader()->hide();
 
@@ -57,16 +58,16 @@ void ItemInventoryView::dragEnterEvent( QDragEnterEvent *event )
     }
 }
 
-void ItemInventoryView::dragLeaveEvent(QDragLeaveEvent *event)
+void ItemInventoryView::dragLeaveEvent( QDragLeaveEvent *event )
 {
     event->accept();
 }
 
-void ItemInventoryView::dragMoveEvent(QDragMoveEvent *event)
+void ItemInventoryView::dragMoveEvent( QDragMoveEvent *event )
 {
     if ( event->mimeData()->hasFormat( ItemMimeData::MimeType() ) )
     {
-        event->setDropAction(Qt::MoveAction);
+        event->setDropAction( Qt::MoveAction );
         event->accept();
     }
     else
@@ -90,13 +91,15 @@ void ItemInventoryView::dropEvent( QDropEvent *event )
     QAbstractItemModel * item_model = qobject_cast< QAbstractItemModel* >( model() );
     if( mime_data && item_model )
     {
-        // Кладём новый объект из фабрики
+        // Кладём новый объект из фабрики в инвентарь
         if( mime_data->GetMovedItem() )
         {
             if( mime_data->GetMovedItem()->GetItemType() == item_type::apple )
-            item_model->setData( model_index,
-                                 mime_data->GetMovedItem()->GetItemId(),
-                                 inventory_role::add_apple );
+            {
+                item_model->setData( model_index,
+                                     mime_data->GetMovedItem()->GetItemId(),
+                                     inventory_role::add_apple );
+            }
         }
         // Передвигаем элементы внутри инвентаря
         else
@@ -114,6 +117,7 @@ void ItemInventoryView::dropEvent( QDropEvent *event )
                                  inventory_role::add_many_items );
             update( from_index );
         }
+
         event->setDropAction( Qt::MoveAction );
         event->accept();
     }
@@ -138,14 +142,19 @@ void ItemInventoryView::mouseMoveEvent( QMouseEvent *event )
         items_count.canConvert( QMetaType::Int )     &&
         items_count.toInt() > 0 )
     {
-        auto hot_spot = event->pos() - QPoint( config::ITEM_WIDTH * model_index.column(),
-                                               config::ITEM_HEIGHT * model_index.row() );
+        auto hot_spot = event->pos() - QPoint( item::draw::APPLE_WIDTH * model_index.column(),
+                                               item::draw::APPLE_HEIGHT * model_index.row() );
 
         auto mime_data = new ItemMimeData;
         mime_data->SetDragPoint( m_drag_point );
 
+        QRect draw_rect( 0, 0, item::draw::APPLE_WIDTH, item::draw::APPLE_HEIGHT );
+        int item_count = model_index.data( inventory_role::count_role).toInt();
+
         auto drag = new QDrag( this );
-        drag->setPixmap( QPixmap( config::APPLE_IMAGE_PATH ) );
+        drag->setPixmap( utils::DrawSelectedItemForDrag( draw_rect,
+                                                         item_type::apple,
+                                                         item_count ) );
         drag->setHotSpot( hot_spot );
         drag->setMimeData( mime_data );
         drag->exec( Qt::MoveAction );
@@ -166,7 +175,6 @@ void ItemInventoryView::mousePressEvent( QMouseEvent *event )
     }
     else if( event->button() == Qt::RightButton )
     {
-        qDebug() << "right button click row "  << model_index.row() << " column " << model_index.column();
         if( item_model )
         {
             if( item_model->setData( model_index, QVariant(), inventory_role::delete_item ) )

@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     databasestorage.cpp \
+    inventory_utils.cpp \
     item.cpp \
     itemdragwidget.cpp \
     itemfactory.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     constants.h \
     databasestorage.h \
+    inventory_utils.h \
     item.h \
     itemdragwidget.h \
     itemfactory.h \

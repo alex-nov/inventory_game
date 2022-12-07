@@ -17,14 +17,17 @@ public:
 
     static QString MimeType();
 
-    // данные для нового элемента из фабрики
+    /** Данные нового элемента из фабрики */
     void SetMovedItem( std::shared_ptr< Item > item );
+    /** Получение перенесенного предмета из фабрики */
     std::shared_ptr< Item > GetMovedItem() const;
 
-    // данные для переноса между ячейками таблицы
+    /** Данные для переноса между ячейками инвентаря*/
     void SetDragPoint( const QPoint& drag_point );
+    /** Получение данных ячейки инвентаря, откуда прозводится перенос*/
     QPoint GetDragPoint() const;
 
+    /* Переопределение методов для корретного опознания MimeData */
     virtual QStringList	formats() const Q_DECL_OVERRIDE;
     virtual bool hasFormat(const QString & mimeType) const Q_DECL_OVERRIDE;
 

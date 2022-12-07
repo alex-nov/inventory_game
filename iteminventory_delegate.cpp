@@ -15,7 +15,7 @@ void InventoryDelegate::paint( QPainter *painter
     if( index.data( inventory_role::count_role ).canConvert( QMetaType::Int ) &&
         index.data( Qt::DecorationRole ).canConvert( QMetaType::QString ) )
     {
-        int item_count = index.data( inventory_role::count_role).toInt();
+        int item_count = index.data( inventory_role::count_role ).toInt();
 
         if( item_count > 0)
         {
@@ -37,7 +37,6 @@ void InventoryDelegate::paint( QPainter *painter
 
             //Отрисовка количества итемок
             QString string_result = QString( "%1" ).arg( item_count );
-
             painter->drawText( option.rect, Qt::AlignBottom | Qt::AlignRight, string_result );
         }
 

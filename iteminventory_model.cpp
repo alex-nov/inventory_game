@@ -45,6 +45,7 @@ QVariant ItemInventoryModel::data( const QModelIndex &index, int role ) const
             variant_result = DatabaseStorage::Instance()->GetItemsCountByPosition( index.row(), index.column() );
         }
         break;
+
     }
 
     return variant_result;
@@ -64,15 +65,11 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
         {
             if( value.canConvert( QMetaType::Int ) )
             {
-
                 t_bool_success = DatabaseStorage::Instance()->MoveItemToInventory(
                      index.row()
                     ,index.column()
-                    ,std::make_shared< Item >( value.toInt(), item_type::apple, config::APPLE_IMAGE_PATH )
+                    ,std::make_shared< Item >( value.toInt(), item_type::apple, item::APPLE_IMAGE_PATH )
                 );
-
-                qDebug() << "ItemInventoryModel::setData add at row" << index.row()
-                         << " column" << index.column();
             }
         }
         break;
@@ -87,9 +84,6 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
                      index.row(),
                      index.column()
                 );
-
-                qDebug() << "ItemInventoryModel::setData add some from" << value.toPoint()
-                         << " to row" << index.row() << " column" << index.column();
             }
         }
         break;
@@ -97,11 +91,9 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
         case inventory_role::delete_item:
         {
             t_bool_success = DatabaseStorage::Instance()->DeleteItemFromInventory( index.row(), index.column() );
-
-            qDebug() << "ItemInventoryModel::setData delete from row" << index.row()
-                     << " column" << index.column();
         }
         break;
+
     }
 
     return t_bool_success;

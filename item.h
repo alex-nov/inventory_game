@@ -11,8 +11,11 @@ class Item
 public:
     explicit Item( const quint32 id, const item_type type,  const QString& image );
 
+    /** Получение уникального id предмета */
     quint32     GetItemId() const;
+    /** Получение типа предмета */
     item_type   GetItemType() const;
+    /** Получение адреса изображения предмета */
     QString     GetImagePath() const;
 
 private:

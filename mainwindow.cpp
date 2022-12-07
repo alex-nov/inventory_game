@@ -12,9 +12,12 @@
 #include <QLabel>
 #include <QString>
 #include <QPixmap>
+#include <QTimer>
+
+#include <QDebug>
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow( QWidget *parent )
     : QMainWindow(parent)
 {
     // Создаем элементы интерфейса
@@ -54,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget( central_widget );
     setWindowTitle(tr("InventoryGame"));
 
+    // Подключаем слоты к сигналам
     connect( m_main_menu, SIGNAL( quit_action() ), SLOT( quit_application() ) );
     connect( m_main_menu, SIGNAL( start_action() ), SLOT( start_game() ) );
     connect( m_main_menu_button, SIGNAL( clicked() ), SLOT( end_game() ) );
@@ -61,28 +65,47 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::quit_application()
 {
-    DatabaseStorage::Instance()->Clear();
     QApplication::quit();
 }
 
 void MainWindow::start_game()
 {
+    // Очистка БД и активация игровых виджетов
     DatabaseStorage::Instance()->Clear();
     m_main_menu_button->setEnabled( true );
     m_inventory->setEnabled( true );
     m_inventory->update();
     m_item_factory->setEnabled( true );
-    // TODO make pretty
-    m_main_menu->hide();
+
+    // Анимация скрытия меню
+    m_main_menu_h = 39;
+    m_main_menu_step = -2;
+    startTimer( 15 );
 }
 
 void MainWindow::end_game()
 {
+    // Отключаем игровые виджеты
     m_main_menu_button->setEnabled( false );
     m_inventory->setEnabled( false );
     m_item_factory->setEnabled( false );
-    // TODO make pretty
-    m_main_menu->show();
+
+    // Анимация появления меню
+    m_main_menu_h = 0;
+    m_main_menu_step = 2;
+    m_main_menu->resize( m_main_menu->width(), m_main_menu_h );
+    startTimer( 15 );
+}
+
+void MainWindow::timerEvent( QTimerEvent *event )
+{
+    // Логика анимации главного муню
+    m_main_menu_h += m_main_menu_step;
+    m_main_menu->resize ( m_main_menu->width(), m_main_menu_h );
+    if( m_main_menu->height() >= 40 || m_main_menu->height() <= 0 )
+    {
+        killTimer( event->timerId( ));
+    }
 }
 
 MainWindow::~MainWindow()

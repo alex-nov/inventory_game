@@ -17,14 +17,24 @@ public:
     ~MainWindow();
 
 public slots:
+    /** Выход из приложения */
     void quit_application();
+    /** Начало игры, скрытие меню */
     void start_game();
+    /** Возврат к начальному состаянию приложения */
     void end_game();
+
+protected:
+    /** Переопределение события таймера для анимации меню */
+    virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 
 private:
     QPushButton* m_main_menu_button;
     ItemDragWidget* m_item_factory;
     ItemInventoryView* m_inventory;
     MainMenu* m_main_menu;
+
+    int m_main_menu_h;
+    int m_main_menu_step;
 };
 #endif // MAINWINDOW_H

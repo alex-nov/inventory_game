@@ -13,6 +13,7 @@ class ItemInventoryModel : public QAbstractTableModel
 public:
     ItemInventoryModel();
 
+    /* Переопределение методов модели */
     virtual int rowCount(
             const QModelIndex &parent) const Q_DECL_OVERRIDE;
 

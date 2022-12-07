@@ -10,6 +10,7 @@ public:
     ItemDragWidget( QWidget *parent = Q_NULLPTR );
 
 protected:
+    /* Переопределение обработчиков действия мыши для переноса */
     void mousePressEvent( QMouseEvent* event ) Q_DECL_OVERRIDE;
     void mouseMoveEvent( QMouseEvent* event ) Q_DECL_OVERRIDE;
 

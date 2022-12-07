@@ -1,4 +1,5 @@
 #include "constants.h"
+#include "inventory_utils.h"
 #include "itemdragwidget.h"
 #include "itemmimedata.h"
 #include "itemfactory.h"
@@ -7,12 +8,14 @@
 #include <QApplication>
 #include <QMimeData>
 #include <QDrag>
+#include <QPainter>
+#include <QBrush>
 
 ItemDragWidget::ItemDragWidget( QWidget *parent )
     : QLabel( parent )
 {
     auto item_pixmap = new QPixmap();
-    item_pixmap->load( config::APPLE_IMAGE_PATH );
+    item_pixmap->load( item::APPLE_IMAGE_PATH );
     setPixmap( *item_pixmap );
     setEnabled( false );
 }
@@ -38,10 +41,10 @@ void ItemDragWidget::mouseMoveEvent(QMouseEvent *event)
             mime_data->SetMovedItem( new_item );
 
             auto drag = new QDrag( this );
-            drag->setPixmap( QPixmap( config::APPLE_IMAGE_PATH ) );
+            drag->setPixmap( utils::DrawSelectedItemForDrag( rect(), item_type::apple, 0 ) );
             drag->setHotSpot( event->pos() );
             drag->setMimeData( mime_data );
-            drag->exec(Qt::CopyAction);
+            drag->exec( Qt::CopyAction );
         }
     }
     QWidget::mouseMoveEvent( event );

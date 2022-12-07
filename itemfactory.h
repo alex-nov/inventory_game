@@ -9,8 +9,10 @@
 class ItemFactory
 {
 public:
+    /** Создания нового предмета с уникальным id */
     std::shared_ptr< Item > CreateItem( item_type m_type );
 
+    /** Получение экземпляра фабрики */
     static ItemFactory* Instance();
 
 private:
@@ -20,7 +22,6 @@ private:
     ItemFactory& operator=(ItemFactory&&);
 
     quint32 m_next_item_id;
-    quint32 m_last_created_item_id;
 };
 
 #endif // ITEMFACTORY_H

@@ -12,6 +12,7 @@ class ItemInventoryView : public QTableView
     Q_OBJECT
 
 protected:
+    /* Переопределение обработчиков действия мыши для drag & drop */
     void dragEnterEvent( QDragEnterEvent* event ) Q_DECL_OVERRIDE;
     void dragLeaveEvent( QDragLeaveEvent *event ) Q_DECL_OVERRIDE;
     void dragMoveEvent(QDragMoveEvent *event) override;
