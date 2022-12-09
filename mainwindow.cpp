@@ -27,7 +27,15 @@ MainWindow::MainWindow( QWidget *parent )
     m_inventory->setModel( inventory_model );
 
     // Объект порождающий новые предметы
-    m_item_factory = new ItemDragWidget();
+    auto grid_lay = new QGridLayout();
+    grid_lay->setContentsMargins( 5, 5, 5, 5 );
+    grid_lay->setSpacing( 15 );
+    auto  drag_w = new ItemDragWidget( item::item_type::apple );
+    grid_lay->addWidget( drag_w );
+    m_item_factories.push_back( drag_w );
+    auto drag_w1 = new ItemDragWidget( item::item_type::orange );
+    grid_lay->addWidget( drag_w1 );
+    m_item_factories.push_back( drag_w1 );
 
     // Элементы управления
     m_main_menu_button = new QPushButton( "Главное меню" );
@@ -36,15 +44,16 @@ MainWindow::MainWindow( QWidget *parent )
 
     // Размещаем элементы на центральном виджете
     auto lay1 = new QVBoxLayout();
-    lay1->addStretch(1);
-    lay1->addWidget( m_item_factory, 0, Qt::AlignCenter );
-    lay1->addStretch(2);
+    lay1->addStretch( 1 );
+    lay1->insertLayout( 0, grid_lay, 1 );
+    lay1->addStretch( 2 );
     lay1->addWidget( m_main_menu_button, 1, Qt::AlignCenter );
 
     auto lay2 = new QHBoxLayout();
-    lay2->addWidget( m_inventory );
-    lay1->addStretch(1);
-    lay2->addItem( lay1 );
+    lay1->addStretch( 1 );
+    lay2->insertWidget( 0, m_inventory, 1, Qt::AlignCenter );
+    lay2->insertLayout( 1, lay1, 1 );
+    lay1->addStretch( 2 );
 
     auto lay3 = new QVBoxLayout();
     lay3->addWidget( m_main_menu );
@@ -75,7 +84,10 @@ void MainWindow::start_game()
     m_main_menu_button->setEnabled( true );
     m_inventory->setEnabled( true );
     m_inventory->update();
-    m_item_factory->setEnabled( true );
+    for( auto factory: m_item_factories )
+    {
+        factory->setEnabled( true );
+    }
 
     // Анимация скрытия меню
     m_main_menu_h = 39;
@@ -88,7 +100,10 @@ void MainWindow::end_game()
     // Отключаем игровые виджеты
     m_main_menu_button->setEnabled( false );
     m_inventory->setEnabled( false );
-    m_item_factory->setEnabled( false );
+    for( auto factory: m_item_factories )
+    {
+        factory->setEnabled( false );
+    }
 
     // Анимация появления меню
     m_main_menu_h = 0;

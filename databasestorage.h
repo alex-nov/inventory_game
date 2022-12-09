@@ -30,6 +30,8 @@ public:
     int  GetItemsCountByPosition( const quint8 row, const quint8 column );
     /** Получение изображения элемента в ячейке инвентаря */
     QString GetItemImagePath( const quint8 row, const quint8 column );
+    item::item_type GetItemType( const quint8 row, const quint8 column );
+
     /** Сохранения нового предмета в базе при создании */
     bool CreateNewItem( std::shared_ptr<Item> item );
 

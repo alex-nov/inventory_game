@@ -2,6 +2,7 @@
 #include "inventory_utils.h"
 #include "iteminventory_view.h"
 #include "iteminventory_delegate.h"
+#include "databasestorage.h"
 #include "itemmimedata.h"
 #include "itemfactory.h"
 
@@ -15,15 +16,17 @@
 #include <QPainter>
 
 
-ItemInventoryView::ItemInventoryView( QWidget *parent )
+ItemInventoryView::ItemInventoryView( const quint32 rows, const quint32 columns, QWidget *parent )
     : QTableView( parent )
+    , m_rows( rows )
+    , m_columns( columns )
 {
     // Настройки внешнего вида инвентаря
-    setFixedSize( config::INVENTORY_COLUMNS_COUNT * item::draw::APPLE_WIDTH,
-                  config::INVENTORY_ROWS_COUNT * item::draw::APPLE_HEIGHT );
+    setFixedSize( config::INVENTORY_COLUMNS_COUNT * item::draw::ITEM_WIDTH,
+                  config::INVENTORY_ROWS_COUNT * item::draw::ITEM_HEIGHT );
 
-    horizontalHeader()->setDefaultSectionSize( item::draw::APPLE_WIDTH );
-    verticalHeader()->setDefaultSectionSize( item::draw::APPLE_HEIGHT );
+    horizontalHeader()->setDefaultSectionSize( item::draw::ITEM_WIDTH );
+    verticalHeader()->setDefaultSectionSize( item::draw::ITEM_HEIGHT );
     horizontalHeader()->hide();
     verticalHeader()->hide();
 
@@ -40,6 +43,7 @@ ItemInventoryView::ItemInventoryView( QWidget *parent )
     setDropIndicatorShown(true);
 
     m_drag_point = QPoint();
+    m_current_drag_index = QModelIndex();
 
     // на старте инвентарь неактивен
     setEnabled( false );
@@ -50,7 +54,7 @@ void ItemInventoryView::dragEnterEvent( QDragEnterEvent *event )
 {
     if( event->mimeData()->hasFormat( ItemMimeData::MimeType() ) )
     {
-        event->accept();
+        event->acceptProposedAction();
     }
     else
     {
@@ -60,26 +64,53 @@ void ItemInventoryView::dragEnterEvent( QDragEnterEvent *event )
 
 void ItemInventoryView::dragLeaveEvent( QDragLeaveEvent *event )
 {
+    m_current_drag_index = QModelIndex();
     event->accept();
 }
 
 void ItemInventoryView::dragMoveEvent( QDragMoveEvent *event )
 {
+    if( m_current_drag_index.isValid() &&
+        m_current_drag_index == indexAt( event->pos() ) )
+    {
+        return;
+    }
+
     if ( event->mimeData()->hasFormat( ItemMimeData::MimeType() ) )
     {
-        event->setDropAction( Qt::MoveAction );
-        event->accept();
+        const ItemMimeData* mime_data = dynamic_cast< const ItemMimeData* >( event->mimeData() );
+
+        m_current_drag_index = indexAt( event->pos() );
+
+        auto item_type_placed = DatabaseStorage::Instance()->GetItemType(
+                     m_current_drag_index.row(),
+                     m_current_drag_index.column() );
+        item::item_type item_type_taken;
+        if( mime_data->GetMovedItem() )
+        {
+            item_type_taken = mime_data->GetMovedItem()->GetItemType();
+        }
+        else
+        {
+            auto taken_index = indexAt( mime_data->GetDragPoint() );
+            item_type_taken = DatabaseStorage::Instance()->GetItemType( taken_index.row(),
+                                                                        taken_index.column() );
+        }
+
+        if( item_type_placed == item::item_type::none ||
+            item_type_placed == item_type_taken )
+        {
+            event->setDropAction( Qt::MoveAction );
+            event->accept();
+            return;
+        }
     }
-    else
-    {
-        event->ignore();
-    }
+
+    event->ignore();
 }
 
 void ItemInventoryView::dropEvent( QDropEvent *event )
 {
-    qDebug() << "ItemInventoryView::dropEvent " << event->pos();
-
     QModelIndex model_index = indexAt( event->pos() );
     if( !model_index.isValid() )
     {
@@ -92,20 +123,20 @@ void ItemInventoryView::dropEvent( QDropEvent *event )
     if( mime_data && item_model )
     {
         // Кладём новый объект из фабрики в инвентарь
-        if( mime_data->GetMovedItem() )
+        auto moved_item = mime_data->GetMovedItem();
+        if( moved_item )
         {
-            if( mime_data->GetMovedItem()->GetItemType() == item_type::apple )
-            {
-                item_model->setData( model_index,
-                                     mime_data->GetMovedItem()->GetItemId(),
-                                     inventory_role::add_apple );
-            }
+            item_model->setData( model_index,
+                                 utils::ConvertItemToHashTable( moved_item ),
+                                 inventory_role::add_item );
         }
         // Передвигаем элементы внутри инвентаря
         else
         {
             // Проверка, что не кладём, откуда взяли
-            if( indexAt( event->pos() ) == indexAt( m_drag_point ) )
+            if( indexAt( event->pos() ) == indexAt( mime_data->GetDragPoint() ) ||
+                mime_data->GetDragPoint().x() < 0 ||
+                mime_data->GetDragPoint().y() < 0 )
             {
                 event->ignore();
                 return;
@@ -122,6 +153,8 @@ void ItemInventoryView::dropEvent( QDropEvent *event )
         event->accept();
     }
     update( model_index );
+
+    m_current_drag_index = QModelIndex();
 }
 
 void ItemInventoryView::mouseMoveEvent( QMouseEvent *event )
@@ -142,22 +175,25 @@ void ItemInventoryView::mouseMoveEvent( QMouseEvent *event )
         items_count.canConvert( QMetaType::Int )     &&
         items_count.toInt() > 0 )
     {
-        auto hot_spot = event->pos() - QPoint( item::draw::APPLE_WIDTH * model_index.column(),
-                                               item::draw::APPLE_HEIGHT * model_index.row() );
+        auto hot_spot = event->pos() - QPoint( item::draw::ITEM_WIDTH * model_index.column(),
+                                               item::draw::ITEM_HEIGHT * model_index.row() );
 
         auto mime_data = new ItemMimeData;
         mime_data->SetDragPoint( m_drag_point );
 
-        QRect draw_rect( 0, 0, item::draw::APPLE_WIDTH, item::draw::APPLE_HEIGHT );
+        QRect draw_rect( 0, 0, item::draw::ITEM_WIDTH, item::draw::ITEM_HEIGHT );
         int item_count = model_index.data( inventory_role::count_role).toInt();
 
         auto drag = new QDrag( this );
-        drag->setPixmap( utils::DrawSelectedItemForDrag( draw_rect,
-                                                         item_type::apple,
-                                                         item_count ) );
+        drag->setPixmap( utils::DrawSelectedItemForDrag(
+                             draw_rect,
+                             DatabaseStorage::Instance()->GetItemType( model_index.row(), model_index.column() ),
+                             item_count ) );
         drag->setHotSpot( hot_spot );
         drag->setMimeData( mime_data );
         drag->exec( Qt::MoveAction );
+
+        m_current_drag_index = indexAt( event->pos() );
     }
 
     QWidget::mouseMoveEvent( event );

@@ -30,7 +30,7 @@ protected:
 
 private:
     QPushButton* m_main_menu_button;
-    ItemDragWidget* m_item_factory;
+    QVector< ItemDragWidget* > m_item_factories;
     ItemInventoryView* m_inventory;
     MainMenu* m_main_menu;
 

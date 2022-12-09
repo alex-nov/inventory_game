@@ -207,6 +207,33 @@ QString DatabaseStorage::GetItemImagePath( const quint8 row, const quint8 column
     return QString();
 }
 
+item::item_type DatabaseStorage::GetItemType(const quint8 row, const quint8 column)
+{
+    if( !m_database_connected )
+    {
+        return item::item_type::none;
+    }
+
+    if( GetItemsCountByPosition( row, column ) > 0 )
+    {
+        QSqlQuery sql_query( m_database );
+        sql_query.prepare(
+                    QString( "SELECT items.type FROM items LEFT JOIN inventory "
+                             "WHERE items.id IN "
+                             "(SELECT inventory.item_id FROM inventory "
+                             "WHERE row=:row AND column=:column LIMIT 1);" ) );
+        sql_query.bindValue( 0, row );
+        sql_query.bindValue( 1, column );
+
+        if( sql_query.exec() && sql_query.next() )
+        {
+            return static_cast< item::item_type >( sql_query.value(0).toUInt() );
+        }
+    }
+
+    return item::item_type::none;
+}
+
 bool DatabaseStorage::CreateNewItem( std::shared_ptr<Item> item )
 {
     if( !m_database_connected )

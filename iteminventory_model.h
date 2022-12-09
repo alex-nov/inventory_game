@@ -11,7 +11,8 @@ class ItemInventoryModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    ItemInventoryModel();
+    ItemInventoryModel( const quint32 rows = config::INVENTORY_ROWS_COUNT,
+                        const quint32 columns = config::INVENTORY_COLUMNS_COUNT );
 
     /* Переопределение методов модели */
     virtual int rowCount(
@@ -28,6 +29,9 @@ public:
             const QModelIndex &index,
             const QVariant &value,
             int role) Q_DECL_OVERRIDE;
+private:
+    quint32 m_rows;
+    quint32 m_columns;
 };
 
 #endif // ITEMINVENTORYMODEL_H

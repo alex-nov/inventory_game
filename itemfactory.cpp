@@ -7,13 +7,17 @@ ItemFactory::ItemFactory()
 }
 
 
-std::shared_ptr<Item> ItemFactory::CreateItem( item_type type )
+std::shared_ptr<Item> ItemFactory::CreateItem( item::item_type type )
 {
     QString image_path;
     switch( type )
     {
-        case item_type::apple:
+        case item::item_type::apple:
             image_path = item::APPLE_IMAGE_PATH;
+            break;
+
+        case item::item_type::orange:
+            image_path = item::ORANGE_IMAGE_PATH;
             break;
     }
 

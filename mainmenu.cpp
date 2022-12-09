@@ -12,9 +12,11 @@ MainMenu::MainMenu(QWidget *parent) :
     auto lay1 = new QHBoxLayout();
     lay1->addStretch(1);
     lay1->addWidget( push_button_start, 0, Qt::AlignCenter );
+
     lay1->addStretch(1);
     lay1->addWidget( push_button_exit, 0, Qt::AlignCenter );
     lay1->addStretch(1);
+
     lay1->setGeometry( QRect( 0, 0, 768, 100) );
     setLayout( lay1 );
 

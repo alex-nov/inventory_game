@@ -10,7 +10,7 @@ class ItemFactory
 {
 public:
     /** Создания нового предмета с уникальным id */
-    std::shared_ptr< Item > CreateItem( item_type m_type );
+    std::shared_ptr< Item > CreateItem( item::item_type m_type );
 
     /** Получение экземпляра фабрики */
     static ItemFactory* Instance();
