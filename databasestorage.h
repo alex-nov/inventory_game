@@ -5,6 +5,7 @@
 #include "constants.h"
 
 #include <QSqlDatabase>
+#include <QModelIndex>
 #include <QtGlobal>
 
 #include <memory>
@@ -19,18 +20,17 @@ public:
     void Clear();
 
     /** Добавление элемента из внешней фабрики в инвентарь */
-    bool MoveItemToInventory( const quint8 row, const quint8 column, std::shared_ptr<Item> item );
+    bool MoveItemToInventory( const QModelIndex& index, std::shared_ptr<Item> item );
     /** Удаление одного элемента из инвентаря */
-    bool DeleteItemFromInventory( const quint8 row, const quint8 column );
+    bool DeleteItemFromInventory( const QModelIndex& index );
     /** Перенос всех элементов из одной ячейки инвентаря в другую */
-    bool MoveItemsIntoInventory( const quint8 row_from, const quint8 column_from,
-                                 const quint8 row_to, const quint8 column_to );
+    bool MoveItemsIntoInventory( const QModelIndex& index_from, const QModelIndex& index_to );
 
     /** Получение кол-ва элементов в ячейке инвентаря */
-    int  GetItemsCountByPosition( const quint8 row, const quint8 column );
+    int  GetItemsCountByPosition( const QModelIndex& index );
     /** Получение изображения элемента в ячейке инвентаря */
-    QString GetItemImagePath( const quint8 row, const quint8 column );
-    item::item_type GetItemType( const quint8 row, const quint8 column );
+    QString GetItemImagePath( const QModelIndex& index );
+    item::item_type GetItemType( const QModelIndex& index );
 
     /** Сохранения нового предмета в базе при создании */
     bool CreateNewItem( std::shared_ptr<Item> item );

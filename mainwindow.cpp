@@ -23,7 +23,7 @@ MainWindow::MainWindow( QWidget *parent )
     // Создаем элементы интерфейса
     // Model-view структура инвентаря
     m_inventory = new ItemInventoryView();
-    auto inventory_model = new ItemInventoryModel();
+    auto inventory_model = new ItemInventoryModel( m_inventory );
     m_inventory->setModel( inventory_model );
 
     // Объект порождающий новые предметы

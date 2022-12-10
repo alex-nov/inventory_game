@@ -82,9 +82,7 @@ void ItemInventoryView::dragMoveEvent( QDragMoveEvent *event )
 
         m_current_drag_index = indexAt( event->pos() );
 
-        auto item_type_placed = DatabaseStorage::Instance()->GetItemType(
-                     m_current_drag_index.row(),
-                     m_current_drag_index.column() );
+        auto item_type_placed = DatabaseStorage::Instance()->GetItemType( m_current_drag_index );
         item::item_type item_type_taken;
         if( mime_data->GetMovedItem() )
         {
@@ -93,8 +91,7 @@ void ItemInventoryView::dragMoveEvent( QDragMoveEvent *event )
         else
         {
             auto taken_index = indexAt( mime_data->GetDragPoint() );
-            item_type_taken = DatabaseStorage::Instance()->GetItemType( taken_index.row(),
-                                                                        taken_index.column() );
+            item_type_taken = DatabaseStorage::Instance()->GetItemType( taken_index );
         }
 
         if( item_type_placed == item::item_type::none ||
@@ -144,7 +141,7 @@ void ItemInventoryView::dropEvent( QDropEvent *event )
 
             QModelIndex from_index = indexAt( mime_data->GetDragPoint() );
             item_model->setData( model_index,
-                                 QPoint( from_index.row(), from_index.column() ),
+                                 from_index,
                                  inventory_role::add_many_items );
             update( from_index );
         }
@@ -159,7 +156,7 @@ void ItemInventoryView::dropEvent( QDropEvent *event )
 
 void ItemInventoryView::mouseMoveEvent( QMouseEvent *event )
 {
-    if( !event->buttons() & Qt::LeftButton )
+    if( ~event->buttons() & Qt::LeftButton )
     {
         QWidget::mouseMoveEvent( event );
         return;
@@ -187,7 +184,7 @@ void ItemInventoryView::mouseMoveEvent( QMouseEvent *event )
         auto drag = new QDrag( this );
         drag->setPixmap( utils::DrawItemForWidget(
                              draw_rect,
-                             DatabaseStorage::Instance()->GetItemType( model_index.row(), model_index.column() ),
+                             DatabaseStorage::Instance()->GetItemType( model_index ),
                              item_count,
                              true ) );
         drag->setHotSpot( hot_spot );

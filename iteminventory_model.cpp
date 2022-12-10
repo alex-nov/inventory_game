@@ -7,8 +7,9 @@
 #include <QPoint>
 
 
-ItemInventoryModel::ItemInventoryModel(  const quint32 rows, const quint32 columns )
-    : m_rows( rows )
+ItemInventoryModel::ItemInventoryModel( QObject* parent, const quint32 rows, const quint32 columns )
+    : QAbstractTableModel( parent )
+    , m_rows( rows )
     , m_columns( columns )
 {
 }
@@ -39,13 +40,13 @@ QVariant ItemInventoryModel::data( const QModelIndex &index, int role ) const
     {
         case Qt::DecorationRole:
         {
-            variant_result = DatabaseStorage::Instance()->GetItemImagePath( index.row(), index.column() );
+            variant_result = DatabaseStorage::Instance()->GetItemImagePath( index );
         }
         break;
 
         case inventory_role::count_role:
         {
-            variant_result = DatabaseStorage::Instance()->GetItemsCountByPosition( index.row(), index.column() );
+            variant_result = DatabaseStorage::Instance()->GetItemsCountByPosition( index );
         }
         break;
 
@@ -70,8 +71,7 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
             if( value.canConvert( QMetaType::QVariantHash ) )
             {
                 t_bool_success = DatabaseStorage::Instance()->MoveItemToInventory(
-                        index.row(),
-                        index.column(),
+                        index,
                         utils::ConvertItemHashToItem( value.toHash() )
                 );
             }
@@ -80,21 +80,16 @@ bool ItemInventoryModel::setData( const QModelIndex &index, const QVariant &valu
 
         case inventory_role::add_many_items:
         {
-            if( value.canConvert( QMetaType::QPoint ) )
+            if( value.canConvert( QMetaType::QModelIndex ) )
             {
-                t_bool_success = DatabaseStorage::Instance()->MoveItemsIntoInventory(
-                     value.toPoint().x(),
-                     value.toPoint().y(),
-                     index.row(),
-                     index.column()
-                );
+                t_bool_success = DatabaseStorage::Instance()->MoveItemsIntoInventory( value.toModelIndex(), index );
             }
         }
         break;
 
         case inventory_role::delete_item:
         {
-            t_bool_success = DatabaseStorage::Instance()->DeleteItemFromInventory( index.row(), index.column() );
+            t_bool_success = DatabaseStorage::Instance()->DeleteItemFromInventory( index );
         }
         break;
 

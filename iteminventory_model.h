@@ -11,7 +11,8 @@ class ItemInventoryModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    ItemInventoryModel( const quint32 rows = config::INVENTORY_ROWS_COUNT,
+    ItemInventoryModel( QObject* parent = nullptr,
+                        const quint32 rows = config::INVENTORY_ROWS_COUNT,
                         const quint32 columns = config::INVENTORY_COLUMNS_COUNT );
 
     /* Переопределение методов модели */

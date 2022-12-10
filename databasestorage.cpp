@@ -103,7 +103,7 @@ void DatabaseStorage::Clear()
     }
 }
 
-bool DatabaseStorage::MoveItemToInventory( const quint8 row, const quint8 column, std::shared_ptr<Item> item )
+bool DatabaseStorage::MoveItemToInventory( const QModelIndex& index, std::shared_ptr<Item> item )
 {
     if( !m_database_connected )
     {
@@ -113,14 +113,14 @@ bool DatabaseStorage::MoveItemToInventory( const quint8 row, const quint8 column
     QSqlQuery sql_query( m_database );
     sql_query.prepare( QString( "INSERT INTO inventory (row, column, item_id)"
                                 "VALUES (:row, :column, :item_id);" ) );
-    sql_query.bindValue( 0, row );
-    sql_query.bindValue( 1, column );
+    sql_query.bindValue( 0, index.row() );
+    sql_query.bindValue( 1, index.column() );
     sql_query.bindValue( 2, item->GetItemId() );
 
     return sql_query.exec();
 }
 
-bool DatabaseStorage::DeleteItemFromInventory( const quint8 row, const quint8 column )
+bool DatabaseStorage::DeleteItemFromInventory( const QModelIndex& index )
 {
     if( !m_database_connected )
     {
@@ -128,7 +128,7 @@ bool DatabaseStorage::DeleteItemFromInventory( const quint8 row, const quint8 co
     }
 
     bool successed_delete_item = false;
-    if( GetItemsCountByPosition( row, column ) > 0 )
+    if( GetItemsCountByPosition( index ) > 0 )
     {
         // Производим полное удаление предмета из игры:
         // Удаляем предмет из таблицы предметов
@@ -138,8 +138,8 @@ bool DatabaseStorage::DeleteItemFromInventory( const quint8 row, const quint8 co
                                         "(SELECT inventory.item_id from inventory "
                                         "WHERE inventory.row=:row AND inventory.column=:column "
                                         "ORDER BY inventory.item_id LIMIT 1);" ) );
-            sql_query.bindValue( 0, row );
-            sql_query.bindValue( 1, column );
+            sql_query.bindValue( 0, index.row() );
+            sql_query.bindValue( 1, index.column() );
             successed_delete_item = sql_query.exec();
         }
         // Удаляем предмет из инвентаря
@@ -149,8 +149,8 @@ bool DatabaseStorage::DeleteItemFromInventory( const quint8 row, const quint8 co
                                         "(SELECT item_id from inventory "
                                         "WHERE row=:row AND column=:column "
                                         "ORDER BY item_id LIMIT 1);" ) );
-            sql_query.bindValue( 0, row );
-            sql_query.bindValue( 1, column );
+            sql_query.bindValue( 0, index.row() );
+            sql_query.bindValue( 1, index.column() );
             successed_delete_item &= sql_query.exec();
         }
     }
@@ -158,7 +158,7 @@ bool DatabaseStorage::DeleteItemFromInventory( const quint8 row, const quint8 co
     return successed_delete_item;
 }
 
-int DatabaseStorage::GetItemsCountByPosition( const quint8 row, const quint8 column )
+int DatabaseStorage::GetItemsCountByPosition( const QModelIndex& index )
 {
     if( !m_database_connected )
     {
@@ -169,8 +169,8 @@ int DatabaseStorage::GetItemsCountByPosition( const quint8 row, const quint8 col
     sql_query.prepare(
                 QString( "SELECT COUNT(*) FROM inventory "
                          "WHERE row=:row AND column=:column;" ) );
-    sql_query.bindValue( 0, row );
-    sql_query.bindValue( 1, column );
+    sql_query.bindValue( 0, index.row() );
+    sql_query.bindValue( 1, index.column() );
 
     if( sql_query.exec() && sql_query.next() )
     {
@@ -180,14 +180,14 @@ int DatabaseStorage::GetItemsCountByPosition( const quint8 row, const quint8 col
     return 0;
 }
 
-QString DatabaseStorage::GetItemImagePath( const quint8 row, const quint8 column )
+QString DatabaseStorage::GetItemImagePath( const QModelIndex& index )
 {
     if( !m_database_connected )
     {
         return 0;
     }
 
-    if( GetItemsCountByPosition( row, column ) > 0 )
+    if( GetItemsCountByPosition( index ) > 0 )
     {
         QSqlQuery sql_query( m_database );
         sql_query.prepare(
@@ -195,8 +195,8 @@ QString DatabaseStorage::GetItemImagePath( const quint8 row, const quint8 column
                              "WHERE items.id IN "
                              "(SELECT inventory.item_id FROM inventory "
                              "WHERE row=:row AND column=:column LIMIT 1);" ) );
-        sql_query.bindValue( 0, row );
-        sql_query.bindValue( 1, column );
+        sql_query.bindValue( 0, index.row() );
+        sql_query.bindValue( 1, index.column() );
 
         if( sql_query.exec() && sql_query.next() )
         {
@@ -207,14 +207,14 @@ QString DatabaseStorage::GetItemImagePath( const quint8 row, const quint8 column
     return QString();
 }
 
-item::item_type DatabaseStorage::GetItemType(const quint8 row, const quint8 column)
+item::item_type DatabaseStorage::GetItemType( const QModelIndex& index )
 {
     if( !m_database_connected )
     {
         return item::item_type::none;
     }
 
-    if( GetItemsCountByPosition( row, column ) > 0 )
+    if( GetItemsCountByPosition( index ) > 0 )
     {
         QSqlQuery sql_query( m_database );
         sql_query.prepare(
@@ -222,8 +222,8 @@ item::item_type DatabaseStorage::GetItemType(const quint8 row, const quint8 colu
                              "WHERE items.id IN "
                              "(SELECT inventory.item_id FROM inventory "
                              "WHERE row=:row AND column=:column LIMIT 1);" ) );
-        sql_query.bindValue( 0, row );
-        sql_query.bindValue( 1, column );
+        sql_query.bindValue( 0, index.row() );
+        sql_query.bindValue( 1, index.column() );
 
         if( sql_query.exec() && sql_query.next() )
         {
@@ -251,8 +251,7 @@ bool DatabaseStorage::CreateNewItem( std::shared_ptr<Item> item )
     return sql_query.exec();
 }
 
-bool DatabaseStorage::MoveItemsIntoInventory( const quint8 row_from, const quint8 column_from,
-                                              const quint8 row_to, const quint8 column_to )
+bool DatabaseStorage::MoveItemsIntoInventory( const QModelIndex& index_from, const QModelIndex& index_to )
 {
     if( !m_database_connected )
     {
@@ -264,10 +263,10 @@ bool DatabaseStorage::MoveItemsIntoInventory( const quint8 row_from, const quint
                                 "item_id IN "
                                 "(SELECT item_id from inventory WHERE "
                                 "row=:row_from AND column=:column_from);" ) );
-    sql_query.bindValue( 0, row_to );
-    sql_query.bindValue( 1, column_to );
-    sql_query.bindValue( 2, row_from );
-    sql_query.bindValue( 3, column_from );
+    sql_query.bindValue( 0, index_to.row() );
+    sql_query.bindValue( 1, index_to.column() );
+    sql_query.bindValue( 2, index_from.row() );
+    sql_query.bindValue( 3, index_from.column() );
 
     return sql_query.exec();
 }
