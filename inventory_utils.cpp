@@ -1,6 +1,7 @@
 #include "inventory_utils.h"
 
 #include <QPainter>
+#include <QIcon>
 #include <QHash>
 #include <QString>
 #include <QVariant>
@@ -8,32 +9,51 @@
 namespace utils
 {
 
-QPixmap DrawSelectedItemForDrag( const QRect& area,
-                                 const item::item_type type,
-                                 const int item_count )
+QString GetItemPathByItemType( const item::item_type type )
+{
+    switch( type )
+    {
+        case item::item_type::apple:
+        {
+           return item::APPLE_IMAGE_PATH;
+        }
+        break;
+
+        case item::item_type::orange:
+        {
+           return item::ORANGE_IMAGE_PATH;
+        }
+        break;
+
+        case item::item_type::none:
+        default:
+        {
+            return item::NOLOGO_IMAGE_PATH;
+        }
+    }
+
+    return QString();
+}
+
+QPixmap DrawItemForWidget( const QRect& area,
+                             const QString& pixmap_path,
+                             const int item_count,
+                             const bool is_selected )
 {
     QPixmap pix( item::draw::ITEM_WIDTH, item::draw::ITEM_HEIGHT );
     QPainter painter( &pix );
     painter.setBrush( Qt::white );
     painter.setPen( Qt::NoPen );
     painter.drawRect( area );
-    switch( type )
-    {
-        case item::item_type::apple:
-        {
-           painter.drawPixmap( area, QPixmap( item::APPLE_IMAGE_PATH ) );
-        }
-        break;
 
-        case item::item_type::orange:
-        {
-           painter.drawPixmap( area, QPixmap( item::ORANGE_IMAGE_PATH ) );
-        }
-        break;
+    painter.drawPixmap( area, QPixmap( pixmap_path ) );
+
+    if( is_selected )
+    {
+        painter.setPen( item::draw::SELECTION_PEN );
+        painter.setBrush( item::draw::SELECTION_BRUSH );
+        painter.drawRect( 1, 1, item::draw::ITEM_WIDTH - 2, item::draw::ITEM_HEIGHT - 2 );
     }
-    painter.setPen( item::draw::SELECTION_PEN );
-    painter.setBrush( item::draw::SELECTION_BRUSH );
-    painter.drawRect( 1, 1, item::draw::ITEM_WIDTH - 2, item::draw::ITEM_HEIGHT - 2 );
 
     if( item_count > 0 )
     {
@@ -43,10 +63,20 @@ QPixmap DrawSelectedItemForDrag( const QRect& area,
 
     painter.end();
     return pix;
-
-
-    return QPixmap();
 }
+
+QPixmap DrawItemForWidget( const QRect& area,
+                             const item::item_type type,
+                             const int item_count,
+                             const bool is_selected )
+{
+    return DrawItemForWidget( area,
+                              GetItemPathByItemType( type ),
+                              item_count,
+                              is_selected );
+}
+
+
 
 QHash< QString, QVariant > ConvertItemToHashTable( const std::shared_ptr< Item > item )
 {

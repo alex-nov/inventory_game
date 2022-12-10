@@ -3,6 +3,7 @@
     <qresource prefix="/">
         <file>res/apple.png</file>
 		<file>res/orange.png</file>
+		<file>res/nologo.png</file>
 		<file>res/delete_item.wav</file>
     </qresource>
 </RCC>

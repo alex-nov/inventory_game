@@ -185,10 +185,11 @@ void ItemInventoryView::mouseMoveEvent( QMouseEvent *event )
         int item_count = model_index.data( inventory_role::count_role).toInt();
 
         auto drag = new QDrag( this );
-        drag->setPixmap( utils::DrawSelectedItemForDrag(
+        drag->setPixmap( utils::DrawItemForWidget(
                              draw_rect,
                              DatabaseStorage::Instance()->GetItemType( model_index.row(), model_index.column() ),
-                             item_count ) );
+                             item_count,
+                             true ) );
         drag->setHotSpot( hot_spot );
         drag->setMimeData( mime_data );
         drag->exec( Qt::MoveAction );

@@ -1,5 +1,6 @@
 #include "itemfactory.h"
 #include "databasestorage.h"
+#include "inventory_utils.h"
 
 ItemFactory::ItemFactory()
     : m_next_item_id( 0 )
@@ -9,20 +10,10 @@ ItemFactory::ItemFactory()
 
 std::shared_ptr<Item> ItemFactory::CreateItem( item::item_type type )
 {
-    QString image_path;
-    switch( type )
-    {
-        case item::item_type::apple:
-            image_path = item::APPLE_IMAGE_PATH;
-            break;
-
-        case item::item_type::orange:
-            image_path = item::ORANGE_IMAGE_PATH;
-            break;
-    }
-
     // Создаем новый объект и сразу сохрянем его в БД
-    auto item = std::make_shared< Item >( m_next_item_id++, type, image_path );
+    auto item = std::make_shared< Item >( m_next_item_id++,
+                                          type,
+                                          utils::GetItemPathByItemType( type ) );
     DatabaseStorage::Instance()->CreateNewItem( item );
 
     return item;

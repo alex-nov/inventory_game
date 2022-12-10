@@ -16,34 +16,7 @@ ItemDragWidget::ItemDragWidget(  const item::item_type type, QWidget *parent )
     , m_factory_type( type )
 {
     setFixedSize( item::draw::ITEM_WIDTH, item::draw::ITEM_HEIGHT );
-
-    QPixmap pix( item::draw::ITEM_WIDTH, item::draw::ITEM_HEIGHT );
-    QPainter painter( &pix );
-
-    // Заполняем фон
-    painter.setBrush( Qt::white );
-    painter.setPen( Qt::NoPen );
-    painter.drawRect( rect() );
-
-    // Рисуем изображение предмета
-    switch ( m_factory_type )
-    {
-        case item::item_type::apple:
-        {
-            painter.drawPixmap( rect(), QPixmap( item::APPLE_IMAGE_PATH ) );
-        }
-        break;
-
-        case item::item_type::orange:
-        {
-            painter.drawPixmap( rect(), QPixmap( item::ORANGE_IMAGE_PATH ) );
-        }
-        break;
-
-    }
-    painter.end();
-    setPixmap( pix );
-
+    setPixmap( utils::DrawItemForWidget( rect(), m_factory_type, 0 ) );
     setEnabled( false );
 }
 
@@ -68,7 +41,7 @@ void ItemDragWidget::mouseMoveEvent(QMouseEvent *event)
             mime_data->SetMovedItem( new_item );
 
             auto drag = new QDrag( this );
-            drag->setPixmap( utils::DrawSelectedItemForDrag( rect(), m_factory_type, 0 ) );
+            drag->setPixmap( utils::DrawItemForWidget( rect(), m_factory_type, 0, true ) );
             drag->setHotSpot( event->pos() );
             drag->setMimeData( mime_data );
             drag->exec( Qt::CopyAction );
