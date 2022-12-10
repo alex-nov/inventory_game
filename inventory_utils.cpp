@@ -25,6 +25,18 @@ QString GetItemPathByItemType( const item::item_type type )
         }
         break;
 
+        case item::item_type::plum:
+        {
+           return item::PLUM_IMAGE_PATH;
+        }
+        break;
+
+        case item::item_type::pear:
+        {
+           return item::PEAR_IMAGE_PATH;
+        }
+        break;
+
         case item::item_type::none:
         default:
         {

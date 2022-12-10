@@ -36,6 +36,12 @@ MainWindow::MainWindow( QWidget *parent )
     auto drag_w1 = new ItemDragWidget( item::item_type::orange );
     grid_lay->addWidget( drag_w1 );
     m_item_factories.push_back( drag_w1 );
+    auto drag_w2 = new ItemDragWidget( item::item_type::plum );
+    grid_lay->addWidget( drag_w2 );
+    m_item_factories.push_back( drag_w2 );
+    auto drag_w3 = new ItemDragWidget( item::item_type::pear );
+    grid_lay->addWidget( drag_w3 );
+    m_item_factories.push_back( drag_w3 );
 
     // Элементы управления
     m_main_menu_button = new QPushButton( "Главное меню" );

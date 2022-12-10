@@ -41,6 +41,8 @@ DatabaseStorage::DatabaseStorage()
     }
 }
 
+
+
 bool DatabaseStorage::InitTables()
 {
     if( !m_database_connected )
@@ -269,4 +271,32 @@ bool DatabaseStorage::MoveItemsIntoInventory( const QModelIndex& index_from, con
     sql_query.bindValue( 3, index_from.column() );
 
     return sql_query.exec();
+}
+
+QVariant DatabaseStorage::RunSQLQuery( const QString &query_text )
+{
+    if( !m_database_connected )
+    {
+        return false;
+    }
+
+    QSqlQuery sql_query;
+    bool success = sql_query.exec( query_text );
+    if( !sql_query.isActive() )
+    {
+        qDebug() << "Не удалось выполнить запрос к базе данных: "
+                 << m_database.databaseName()
+                 << QChar('\n')
+                 << "Query: "
+                 << sql_query.lastQuery()
+                 << QChar('\n')
+                 << "Сообщение драйвера базы данных: "
+                 << sql_query.lastError();
+    }
+
+    if( success && sql_query.next() )
+    {
+        return sql_query.value( 0 );
+    }
+    return QVariant();
 }

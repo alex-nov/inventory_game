@@ -21,12 +21,16 @@ namespace item
 {
     const QString APPLE_IMAGE_PATH = ":/res/apple.png";
     const QString ORANGE_IMAGE_PATH = ":/res/orange.png";
+    const QString PLUM_IMAGE_PATH = ":/res/plum.png";
+    const QString PEAR_IMAGE_PATH = ":/res/pear.png";
     const QString NOLOGO_IMAGE_PATH = ":/res/nologo.png";
 
     enum class item_type : quint8
     {
         apple = 0,
         orange,
+        plum,
+        pear,
         none = 99
     };
 

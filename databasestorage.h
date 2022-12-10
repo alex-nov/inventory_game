@@ -7,6 +7,7 @@
 #include <QSqlDatabase>
 #include <QModelIndex>
 #include <QtGlobal>
+#include <QVariant>
 
 #include <memory>
 
@@ -18,6 +19,8 @@ public:
 
     /** Очистка таблиц базы данных */
     void Clear();
+
+    QVariant RunSQLQuery( const QString& query );
 
     /** Добавление элемента из внешней фабрики в инвентарь */
     bool MoveItemToInventory( const QModelIndex& index, std::shared_ptr<Item> item );
